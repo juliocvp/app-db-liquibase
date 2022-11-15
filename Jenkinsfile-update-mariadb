@@ -1,0 +1,20 @@
+pipeline {
+  agent {
+    docker { image 'liquibase/liquibase:4.15.0' }
+  }
+  environment {
+    MARIADB_CREDENTIALS=credentials('mariadbuser')
+  }
+  stages {
+    stage('Status') {
+      steps {
+        sh 'liquibase status --url="jdbc:mariadb://192.168.67.8:3306/mariadb?" --changeLogFile=app-wrapper.xml --username=$MARIADB_CREDENTIALS_USR --password=$MARIADB_CREDENTIALS_PSW'
+      }
+    }
+    stage('Update') {
+      steps {
+        sh 'liquibase update --url="jdbc:mariadb://192.168.67.8:3306/mariadb" --changeLogFile=app-wrapper.xml --username=$MARIADB_CREDENTIALS_USR --password=$MARIADB_CREDENTIALS_PSW'
+      }
+    }
+  }
+}
